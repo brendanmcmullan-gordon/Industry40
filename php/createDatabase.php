@@ -1,5 +1,5 @@
 // Author : Steve Gale
-// Modified : SG - 27/03/19
+// Modified : SG - 27/03/19 -
 // Copyright 2019 Steve Gale - seek permission and terms of use before you copy or modify this code
 <?php
 $servername = "localhost";
