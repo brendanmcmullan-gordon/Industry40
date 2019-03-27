@@ -1,0 +1,7 @@
+CREATE TABLE TestData (
+id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
+deviceName VARCHAR(20) NOT NULL,
+humidity VARCHAR(8),
+temperature VARCHAR(8),
+read_date TIMESTAMP
+)
