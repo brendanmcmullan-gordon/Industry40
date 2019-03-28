@@ -1,28 +1,28 @@
 # Industry40
 Gordon ICT Industry 4.0 project
 
-Collaborative class project
-Implement IoT technology sensors to monitor various environmental variables
-Read and store this data, and display to users through a web interface
+Collaborative class project <br/>
+Implement IoT technology sensors to monitor various environmental variables <br/>
+Read and store this data, and display to users through a web interface <br/>
 
--PHP Group
-Chris -- TEAM LEADER
-Jyhe
-Thaddeus
+-PHP Group <br/>
+Chris -- TEAM LEADER <br/>
+Jyhe <br/>
+Thaddeus <br/>
 
--SQL Group
-Jyhe -- TEAM LEADER
-Aiden
-William
+-SQL Group <br/>
+Jyhe -- TEAM LEADER <br/>
+Aiden <br/>
+William <br/>
 
--Gateway/Python group
-Thaddeus -- TEAM LEADER
-Chris
-Josh
-Jed
+-Gateway/Python group <br/>
+Thaddeus -- TEAM LEADER <br/>
+Chris <br/>
+Josh <br/>
+Jed <br/>
 
--Dashboard group
-William -- TEAM LEADER
-Jack
-Jed
-Aiden
+-Dashboard group <br/>
+William -- TEAM LEADER <br/>
+Jack <br/>
+Jed <br/>
+Aiden <br/>
