@@ -1,1 +1,3 @@
-CREATE DATABASE Industry40db
+CREATE DATABASE Industry40db{
+time to over write boi
+}
