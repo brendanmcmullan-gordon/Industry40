@@ -2,7 +2,7 @@
 Gordon ICT Industry 4.0 project
 
 Collaborative class project <br/>
-Implement IoT technology sensors in various rooms to monitor various environmental variables <br/>
+Implement IoT technology sensors in various rooms to monitor environmental variables <br/>
 Read and store this data, and display to users through a web interface <br/>
 
 -PHP Group <br/>
