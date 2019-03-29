@@ -1,7 +1,7 @@
-// Author : Steve Gale
-// Modified : SG - 27/03/19 -
-// Copyright 2019 Steve Gale - seek permission and terms of use before you copy or modify this code
 <?php
+// Author : Steve Gale 27/03/9
+// Modified : SG - 29/03/19 -
+// Copyright 2019 Steve Gale - seek permission and terms of use before you copy or modify this code
 $servername = "localhost";
 $username = "I40";
 $password = "Password1";
