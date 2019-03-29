@@ -6,14 +6,10 @@ import json
 import time
 
 # IP address of PHP / MySQL server
-host = '192.168.88.233'
+host = '192.168.88.236'
 port = 80
 
 # check if Lopy DHCP IP has changed
-
-postStr = 'POST /SipyRest/InsertSipyIOTjsonRESTData2.php HTTP/1.1\r\n'
-hostStr = 'Host: %s:%s\r\n'%(str(host),str(port))
-contentTypeStr = 'Content-Type: application/json\r\n'
 
 
 for i in range(0,3):
@@ -34,7 +30,7 @@ for i in range(0,3):
         # construct new json string with measured values inserted for server post
         # construct json string with measured values insetred
         contentStr='{ "RoomName" : "E223", "Humidity" : "%.2f", "Temperature": "%.2f" }'%(humidityValue,tempValue)
-        postStr = 'POST /i40Test/InsertJsonRESTData.php HTTP/1.1\r\n'
+        postStr = 'POST /i40Test/test/InsertJsonRESTData.php HTTP/1.1\r\n'
         hostStr = 'Host: %s:%s\r\n'%(str(host),str(port))
         contentTypeStr = 'Content-Type: application/json\r\n'
         contentLengthStr = 'Content-Length: %s\r\n\r\n'%str(len(contentStr))
