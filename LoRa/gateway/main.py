@@ -1,3 +1,6 @@
+#// Author : Steve Gale 29/04/19
+#// Modified : SG - 29/04/19 -
+#// Copyright 2019 Steve Gale - seek permission and terms of use before you copy or modify this code
 import socket
 import struct
 from network import LoRa
@@ -16,20 +19,20 @@ hostStr = 'Host: %s:%s\r\n'%(str(host),str(port))
 contentTypeStr = 'Content-Type: application/json\r\n'
 
 # A basic package header
-# B: 1 byte for the deviceId
-# B: 1 byte for the pkg size
-# %ds: Formated string for string
+# B: 1 byte for the deviceId - recv_pkg[0]
+# B: 1 byte for the pkg size - recv_pkg[1]
+# %ds: Formated string for string  apprx 23 chars
 _LORA_PKG_FORMAT = "!BB%ds"
 # A basic ack package
-# B: 1 byte for the deviceId
-# B: 1 bytes for the pkg size
-# B: 1 byte for the Ok (200) or error messages
+# B: 1 byte for the deviceId - 
+# B: 1 bytes for the pkg size 
+# B: 1 byte for the Ok (200) or error messages 
 _LORA_PKG_ACK_FORMAT = "BBB"
 
 # Open a LoRa Socket, use rx_iq to avoid listening to our own messages, use australian frequency
 #lora = LoRa(mode=LoRa.LORA, frequency=916800000,rx_iq=True)
 # set to 922.2 MHz for Malaysia
-lora = LoRa(mode=LoRa.LORA, frequency=922200000,rx_iq=True)
+lora = LoRa(mode=LoRa.LORA, frequency=916800000,rx_iq=True)
 lora_sock = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
 lora_sock.setblocking(False)
 
@@ -87,5 +90,5 @@ while (True):
          print ("Buffer too small OR JSON Value error")
       # Respond to device with an acknowledge packet
       ack_pkg = struct.pack(_LORA_PKG_ACK_FORMAT, device_id, 1, 200)
-      lora_sock.send(ack_pkg)
+      lora_sock.send(ack_pkg)       # ack response sent to lora client
  

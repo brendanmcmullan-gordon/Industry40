@@ -13,17 +13,17 @@ port = 80
 
 
 for i in range(0,3):
-    time.sleep(1)
-    tempValue = 23.3        #/100.0
-    humidityValue = 50
-    try:
+    time.sleep(1)           # 1 sec delay
+    tempValue = 23.3        # test data
+    humidityValue = 50      #test data
+    try:                    # try to connect to server
         # Test message  message based on the package format (protocol definition)
-        device_id = 1
+        device_id = 1       # simulated lora client id
         msg = '{ "H" : "%.2f", "T": "%.2f" }'%(humidityValue,tempValue)
         print('Device: %d - Pkg:  %s' % (device_id, msg))
          
         # extract measured values from recieved Json string from LoRa client message
-        obJsMeasuredVals = json.loads(msg) 
+        obJsMeasuredVals = json.loads(msg)                  # json object
         TemperatureStr = json.dumps(obJsMeasuredVals["T"])  # key for Temperature value in dictionary
         HumidityStr = json.dumps(obJsMeasuredVals["H"])     # key for Humidity value in dictionary
  
@@ -37,7 +37,7 @@ for i in range(0,3):
          
         # format HTTP post payload string for sending to the PHP / mySQL server
         payload =  postStr + hostStr+ contentTypeStr + contentLengthStr  + contentStr
-        print(payload)
+        print(payload)      #debugging
         
         # connect to php / database server, send the payload data and recieve the server response
         s = socket.socket(
