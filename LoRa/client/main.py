@@ -9,13 +9,13 @@ from SI7006A20 import SI7006A20
 
 from network import LoRa
 
-# A basic package header
+# A basic package header for sending to the gateway
 # B: 1 byte for the deviceId
 # B: 1 bytes for the pkg size
 # %ds - dynamically specifys the length of the string s in the format
 _LORA_PKG_FORMAT = "BB%ds"
 
-# A basic ack package
+# A basic ack package for response from gateway
 # B: 1 byte for the deviceId - replaced with last byte of 8 byte mac address -  DEVICE_ID = 0x01
 # B: 1 byte for the pkg size
 # B: 1 byte for the Ok (200) or error messages
@@ -28,7 +28,7 @@ si = SI7006A20(py)
 # Open a Lora Socket, use tx_iq to avoid listening to our own messages
 # added australian frequency=916800000
 #lora = LoRa(mode=LoRa.LORA, frequency=916800000, tx_iq=True)
-lora = LoRa(mode=LoRa.LORA, frequency=922200000, tx_iq=True)
+lora = LoRa(mode=LoRa.LORA, frequency=916800000, tx_iq=True)
 lora_sock = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
 lora_sock.setblocking(False)
 
@@ -46,9 +46,10 @@ while(True):
     # Package send the JsoN contentStr containing temp and humidity values
     msg = contentStr
     pkg = struct.pack(_LORA_PKG_FORMAT % len(msg), device_addr, len(msg), msg)
-    lora_sock.send(pkg)
+    lora_sock.send(pkg)     # sends packet to gateway via LoRa
         
-    # Wait for the response from the gateway. NOTE: For this demo the device does an infinite loop for while waiting the response. Introduce a max_time_waiting for you application
+    # Wait for the response from the gateway. 
+    # NOTE: For this demo the device does an infinite loop for while waiting the response. Introduce a max_time_waiting for you application
     waiting_ack = True
     recvTimout = 0; # set a recieve timeout for 20 seconds
     while(waiting_ack and recvTimout < 20):
