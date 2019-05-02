@@ -8,7 +8,7 @@ header("Content-Type: application/json; charset=UTF-8");
 include_once '../config/database.php';
 include_once '../objects/roomData.php';
  
-// instantiate database and product object
+// instantiate database and roomData object
 $database = new Database();
 $db = $database->getConnection();
  
@@ -56,7 +56,7 @@ if($num>0){
     echo json_encode($roomData_arr);
 }
  
-// no products found will be here
+// no roomData found will be here
 
 
 // ref below
