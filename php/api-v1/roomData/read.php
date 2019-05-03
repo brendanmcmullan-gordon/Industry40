@@ -55,8 +55,17 @@ if($num>0){
     // show roomData data in json format
     echo json_encode($roomData_arr);
 }
+else{
+    // no roomData found will be here
+    // set response code - 404 Not found
+    http_response_code(404);
  
-// no roomData found will be here
+    // tell the user no roomData found
+    echo json_encode(
+        array("message" => "No roomData found.")
+    );
+}
+
 
 
 // ref below
