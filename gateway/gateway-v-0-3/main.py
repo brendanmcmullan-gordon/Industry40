@@ -3,21 +3,21 @@
 Author:     Industry 4.0 Python Collab Group
              -  Thaddeus Treloar
 
-Version:    0.2
+Version:    0.3
 Phase:      Full python prototype
 
-V0.2 Changes:
-
-    -
+Notes:  Asyncronous version of v0.2
+        Added micropython compatible module names
 
 '''
 
-import threading, queue, socket
+import asyncore
 
-from json import loads, dumps
-from datetime import datetime
-from time import sleep
-from struct import pack, unpack
+import usocket as socket
+import uasyncio as asyncio
+from ujson import loads, dumps
+from utime import sleep
+from ustruct import pack, unpack
 from network import LoRa
 
 
@@ -100,16 +100,21 @@ def parsePacket(clientPacket):
 
         return None, "Buffer too small or JSON key value error"
 
-def listenClient(loraSocket):
+async def listenClient(loraSocket, asyncQueue):
 
+    clientPacket = ""
     # Recieve packet until TimeoutError ocurrs
-    try:
-        clientPacket = loraSocket.recv(512)
-    except Exception as error:
-        return None, "Caught exception while listening: %s" % error
+    while True:
+        try:
+            clientPacket = loraSocket.recv(512)
 
-    if len(clientPacket) > 2:
-        return clientPacket, None
+        except Exception as error:
+            return None, "Caught exception while listening: %s" % error
+
+        if len(clientPacket) > 2:
+            return clientPacket, None
+
+        await asyncio.sleep(60)
 
 def sendClientAck(functionArguments):
 
@@ -132,10 +137,11 @@ def createServerSocket():
 def createClientSocket():
 
     lora = LoRa(mode=LoRa.LORA, frequency=916800000,rx_iq=True)
-    loraSocket = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
+    loraSocket = asyncore.create_socket(socket.AF_LORA, socket.SOCK_RAW)
 
     # socket set to Block mode. Change made from steve's code
-    loraSocket.setblocking(True)
+    #set back to non blocking for async compatibility
+    loraSocket.setblocking(False)
 
     # set socket timeout in case a client loses connectivity
     # part way through transmission
@@ -143,10 +149,10 @@ def createClientSocket():
 
     return loraSocket
 
-def retryPacket(sendFunction, functionArguments):
+async def retryPacket(sendFunction, functionArguments):
     for i in len(__SETTINGS["FAILED_PACKET_RETRY_LIMIT"]):
 
-        sleep(__SETTINGS["FAILED_PACKET_RETRY_INTERVAL"])
+        await asyncio.sleep(__SETTINGS["FAILED_PACKET_RETRY_INTERVAL"])
 
         response, errorMessage = sendFunction(functionArguments)
 
@@ -164,17 +170,26 @@ def retryPacket(sendFunction, functionArguments):
     # packet thread was able to successfully send the packet
     return response, None
 
-def packetThreadWorker(threadListenStatus):
+async def asyncPacketTask(asyncQueue):
 
     loraSocket = createClientSocket()
-    # listen for sensor packets
-    clientPacket, listenErr = listenClient(loraSocket)
+
+    while True:
+        if asyncQueue.empty():
+            await listenQueue.put(False)
+            # listen for sensor packets
+            await asyncio.sleep(1)
+            await clientPacket, listenErr = listenClient(loraSocket, asyncQueue)
+            break
+        else:
+            await asyncio.sleep(10)
+            continue
 
     # if there is an error listening, send a notification
     # to main thread and exit
     if listenErr != None:
 
-        threadListenStatus(False)
+        await asyncQueue.get()
 
             # Send log
 
@@ -185,7 +200,8 @@ def packetThreadWorker(threadListenStatus):
         # Send a notification of successful listen
         # to main thread so that second listen
         # thread can be started
-        threadListenStatus.put(True)
+        await asyncQueue.get()
+        await asyncio.sleep(1)
 
         clientPacketParsed, clientId, errorMessage = parsePacket(clientPacket)
 
@@ -229,7 +245,15 @@ def packetThreadWorker(threadListenStatus):
         log db entry success or failure
         '''
         #log successful db entry
+        loraSocket.close()
+        dbSocket.close()
         return
+
+async def asyncPacketWorker(asyncQueue):
+
+    while True:
+
+        await mainLoop.create_task()
 
 
 def init():
@@ -255,51 +279,18 @@ def init():
     return True, None
 
 # Main loop
-def main(): 
+async def main():
                 # Ignore unused error until log implementation
     initStatus, initErr = init()
 
-    threadListenStatus = queue.Queue()
+    asyncQueue = asyncio.Queue()
 
     if initStatus == True:
 
-        # create thread objects for listening and sending data packets
-        packetThread1 = threading.Thread(name="listen1", target="packetThreadWorker", args=(threadListenStatus))
-        packetThread2 = threading.Thread(name="listen2", target="packetThreadWorker", args=(threadListenStatus))
-        packetThread3 = threading.Thread(name="listen1", target="packetThreadWorker", args=(threadListenStatus))
-        packetThread4 = threading.Thread(name="listen2", target="packetThreadWorker", args=(threadListenStatus))
-
         while True:
 
-            # check if the first listen thread is already running
-            # if not, then run the thread and block until main
-            # thread is notified that listening is successful or not
-            if not packetThread1.isAlive():
-                packetThread1.start()
-                threadListenStatus.get()
-                continue
-            # check if the second listen thread is already running
-            # if not, then run the thread and block until main
-            # thread is notified that listening is successful or not
-            elif not packetThread2.isAlive():
-                packetThread2.start()
-                threadListenStatus.get()
-                continue
-            # And the same continues for thread 3 and 4
-            elif not packetThread3.isAlive():
-                packetThread3.start()
-                threadListenStatus.get()
-                continue
-            elif not packetThread4.isAlive():
-                packetThread4.start()
-                threadListenStatus.get()
-                continue
-            # as a fallback, this else will run if both threads
-            # happen to be running at the same time.
-            # If run, wait 2 secs before continuing the loop
-            else:
-                sleep(2)
-                continue
+            await asyncio.gather(asyncPacketWorker(asyncQueue), asyncPacketWorker(asyncQueue), asyncPacketWorker(asyncQueue), asyncPacketWorker(asyncQueue))
+
     else:
         '''
         # need to add logging either files or
@@ -311,3 +302,9 @@ def main():
         exit(1)
 
     exit(0)
+
+
+global mainLoop
+mainLoop = asyncio.get_event_loop()
+mainLoop.run_until_complete(main())
+mainLoop.close()
