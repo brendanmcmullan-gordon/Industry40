@@ -289,7 +289,7 @@ async def main():
 
         while True:
 
-            await asyncio.gather(asyncPacketWorker(asyncQueue), asyncPacketWorker(asyncQueue), asyncPacketWorker(asyncQueue), asyncPacketWorker(asyncQueue))
+            await asyncio.gather(*[asyncPacketWorker(asyncQueue) for x in range(__SETTINGS["FAILED_PACKET_RETRY_LIMIT"])])
 
     else:
         '''
